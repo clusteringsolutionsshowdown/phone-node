@@ -16,3 +16,24 @@ object PhoneNodeApp extends App with LogSupport {
   as.actorOf(Props[Manager], s"manager_$port")
 
 }
+
+/*
+
+  SPECIFICATIONS:
+
+  - there is one "listener" node which listens to incoming connection requests
+  - each request contains simply location information (lat, lon) in integer
+  - "phone" nodes store state about connected phones
+  - upon a new connection, the listener sends a message to all phone nodes
+  - each phone actor checks if it matches with the newly connected phone
+  - the listener chooses the phone node to which send the newly connected phone as the one which has the least load
+  - if all phone nodes are approaching full load, the listener will require the spawning of a new node // TODO
+
+  LIMITATIONS for the demo:
+
+  - we only use a pseudo-location as state of a connected phone
+  - we use HTTP connections instead of WebSockets which should be used in reality to allow bidirectional communication
+    among the connected phones
+  - we only work with scaling up the nodes // TODO discuss
+
+ */
