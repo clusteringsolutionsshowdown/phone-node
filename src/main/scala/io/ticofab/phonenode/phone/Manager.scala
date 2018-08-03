@@ -26,4 +26,5 @@ class Manager extends Actor with LogSupport {
       val phone = context.actorOf(Props(new Phone(location)), name)
       sender ! PhoneActorReady(phone, location)
   }
+
 }

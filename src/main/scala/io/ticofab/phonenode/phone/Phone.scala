@@ -9,7 +9,7 @@ class Phone(myLocation: Location) extends Actor with LogSupport {
 
   info(s"phone actor ${self.path.name} created for location $myLocation")
 
-  override def receive = {
+  override def receive: Receive = {
     case CheckMatchingWith(phone, itsLocation) =>
       if (phone != self && myLocation.isCloseEnoughTo(itsLocation)) {
         logMatched(self, phone)
