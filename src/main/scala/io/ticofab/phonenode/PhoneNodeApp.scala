@@ -31,9 +31,8 @@ object PhoneNodeApp extends App with LogSupport {
 
   LIMITATIONS for the demo:
 
+  - we don't deal with failures except maybe notifying them
   - we only use a pseudo-location as state of a connected phone
-  - we use HTTP connections instead of WebSockets which should be used in reality to allow bidirectional communication
-    among the connected phones
-  - we only work with scaling up the nodes // TODO discuss
+  - we only work with scaling up the nodes and not down // TODO discuss
 
  */
