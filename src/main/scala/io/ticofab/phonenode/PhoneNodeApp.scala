@@ -13,7 +13,7 @@ object PhoneNodeApp extends App with LogSupport {
   val as = ActorSystem("showdown")
 
   val port = ConfigFactory.load().getInt("akka.remote.netty.tcp.port")
-  as.actorOf(Props[Manager], s"manager_$port")
+  as.actorOf(Props[Manager], s"node$port")
 
 }
 

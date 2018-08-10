@@ -32,7 +32,7 @@ class Manager extends Actor with LogSupport {
       val device = context.actorOf(Props(new Device(location)), name)
       (device ? GetFlowSource) (3.seconds)
         .mapTo[FlowSource]
-        .map(flowSource => DeviceActorReady(device, location, flowSource.ref))
+        .map(flowSource => DeviceActorReady(self, device, location, flowSource.ref))
         .pipeTo(sender)
   }
 
