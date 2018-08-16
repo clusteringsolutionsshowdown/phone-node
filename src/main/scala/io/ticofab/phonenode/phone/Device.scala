@@ -5,7 +5,7 @@ import akka.pattern.pipe
 import akka.stream.scaladsl.{Keep, Sink, Source, StreamRefs}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import io.ticofab.phonecommon.Location
-import io.ticofab.phonecommon.Messages.{CheckMatchingWith, YouMatchedWith}
+import io.ticofab.phonecommon.Messages.{CheckMatchingWith, MessageForMatchedDevice, YouMatchedWith}
 import io.ticofab.phonenode.phone.Manager.{FlowSource, GetFlowSource}
 import org.reactivestreams.Publisher
 import wvlet.log.LogSupport
@@ -26,19 +26,30 @@ class Device(myLocation: Location) extends Actor with LogSupport {
 
   val streamRef = Source.fromPublisher(publisher).runWith(StreamRefs.sourceRef())
 
+  var matchedDevice: Option[ActorRef] = None
+
   override def receive: Receive = {
     case GetFlowSource => streamRef.map(FlowSource).pipeTo(sender)
 
-    case CheckMatchingWith(phone, itsLocation) =>
-      if (phone != self && myLocation.isCloseEnoughTo(itsLocation)) {
-        logMatched(self, phone)
-        down ! s"I found a match with device '${phone.path.name}'!"
-        phone ! YouMatchedWith(self)
+    case CheckMatchingWith(device, itsLocation) =>
+      if (device != self && myLocation.isCloseEnoughTo(itsLocation)) {
+        matchedDevice = Some(device)
+        logMatched(self, device)
+        down ! s"I found a match with device '${device.path.name}'!"
+        device ! YouMatchedWith(self)
       }
 
-    case YouMatchedWith(phone) =>
-      down ! s"I got notified that I matched with device '${phone.path.name}'!"
-      logMatched(self, phone)
+    case YouMatchedWith(device) =>
+      down ! s"I got notified that I matched with device '${device.path.name}'!"
+      logMatched(self, device)
+
+    case MessageForMatchedDevice(msg) =>
+      debug(s"received a message for my matched one: $msg")
+      matchedDevice.foreach(_ ! msg)
+
+    case msg: String =>
+      debug(s"received a message for my device: $msg")
+      down ! msg
   }
 
   // logs that this phone matched with another phone
