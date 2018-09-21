@@ -2,6 +2,8 @@ package io.ticofab.phonenode.phone
 
 import akka.actor.{Actor, Props, RootActorPath}
 import akka.cluster.Cluster
+import akka.management.AkkaManagement
+import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.pattern.{ask, pipe}
 import akka.stream.SourceRef
 import io.ticofab.phonecommon.Messages.{CheckMatchingWith, DeviceActorReady, DeviceConnected, RegisterNode}
@@ -13,6 +15,10 @@ import scala.concurrent.duration._
 
 class Manager extends Actor with LogSupport {
   info(s"starting, name is ${self.path.name}")
+
+  AkkaManagement(context.system).start()
+  ClusterBootstrap(context.system).start()
+
 
   // make sure that we register only we we are effectively up
   val cluster = Cluster(context.system)
