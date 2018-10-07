@@ -14,7 +14,7 @@ spec:
         metadata:
             labels:
                 app: phone-node
-                actorSystemName: phone-cluster
+                actorSystemName: showdown
         spec:
             containers:
             -   name: phone-node
