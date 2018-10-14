@@ -17,4 +17,4 @@ WORKDIR /app
 
 COPY --from=build /build/target/scala-2.12/phone-node.jar .
 
-CMD ["java", "-jar", "phone-node.jar"]
+CMD ["java", "-Dconfig.file=/config/akka.conf", "-jar", "phone-node.jar"]
