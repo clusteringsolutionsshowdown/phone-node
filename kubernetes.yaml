@@ -18,7 +18,7 @@ spec:
         spec:
             containers:
             -   name: phone-node
-                image: clusteringsolutionsshowdown/phone-node:2
+                image: clusteringsolutionsshowdown/phone-node:4
                 livenessProbe:
                     tcpSocket:
                         port: 8558
@@ -35,12 +35,16 @@ spec:
                 -   name: akka-mgmt-http
                     containerPort: 8558
                     protocol: TCP
+                env:
+                -   name: NAMESPACE
+                    valueFrom:
+                        fieldRef:
+                            fieldPath: metadata.namespace
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
     name: pod-reader
-    namespace: akka
 rules:
 -   apiGroups: [""] # "" indicates the core API group
     resources: ["pods"]
@@ -50,14 +54,24 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
     name: read-pods
-    namespace: akka
 subjects:
 # Note the `name` line below. The first default refers to the namespace. The second refers to the service account name.
 # For instance, `name: system:serviceaccount:myns:default` would refer to the default service account in namespace `myns`
 -   kind: ServiceAccount
     name: default
-    namespace: akka
 roleRef:
     kind: Role
     name: pod-reader
     apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: akka-config
+data:
+    akka.conf: |-
+        include "application"
+
+        akka {
+          loglevel = "INFO"
+        }
